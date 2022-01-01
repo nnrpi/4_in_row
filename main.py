@@ -1,5 +1,6 @@
 from Field import Field
 from tkinter import *
+from typing import Union
 
 CANVAS_WIDTH = 1200
 CANVAS_HEIGHT = 650
@@ -19,11 +20,11 @@ player = False
 print_field = True
 
 
-def make_turn(col: str) -> int:
+def try_turn(col: Union[int, str]) -> int:
     global player
     global moves
     global somebody_wins
-    if not col.isdigit() or 1 > int(col) or int(col) > 7:
+    if (isinstance(col, str) and not col.isdigit()) or 1 > int(col) or int(col) > 7:
         text_label['text'] = "Please, type the correct number of the column"
         return 2
     col = int(col) - 1
@@ -37,15 +38,11 @@ def make_turn(col: str) -> int:
     return somebody_wins
 
 
-def on_change(entry_col):
-    if somebody_wins or moves >= 42:
-        entry_col.widget.delete(0, 'end')
-        return
-    col = entry_col.widget.get()
-    entry_col.widget.delete(0, 'end')
-    result = make_turn(col)
+def make_turn(col: Union[int, str]) -> None:
+    result = try_turn(col)
     if result != 2:
-        text_label['text'] = "Player {0}, please type the number of the column\nwhere you'd lke to put your chip:".format(
+        text_label[
+            'text'] = "Player {0}, please type the number of the column\nwhere you'd lke to put your chip:".format(
             player + 1)
         col = int(col) - 1
         row = 6 - field.used[col]
@@ -61,13 +58,32 @@ def on_change(entry_col):
             text_label['text'] = "Draw!"
 
 
+def on_change(entry_col) -> None:
+    if somebody_wins or moves >= 42:
+        entry_col.widget.delete(0, 'end')
+        return
+    col = entry_col.widget.get()
+    entry_col.widget.delete(0, 'end')
+    make_turn(col)
+
+
+def on_click_cell(event) -> None:
+    if somebody_wins or moves >= 42:
+        return
+    col = event.x // 100 + 1
+    make_turn(col)
+
+
 def main():
     root.resizable(width=False, height=False)
-    c.pack()
-    c.create_rectangle(0, 0, 700, 600, fill='#8D84FF')
+    rect = c.create_rectangle(0, 0, 700, 600, fill='#8D84FF')
+    cells = [
+        [c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3) for row in
+         range(6)]
+        for col in range(7)]
     for col in range(7):
         for row in range(6):
-            c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3)
+            c.tag_bind(cells[col][row], '<ButtonPress-1>', on_click_cell)
     for col in range(7):
         number_frame = Frame(root, width=100, height=50, bg="white")
         number_frame.pack_propagate(False)
@@ -77,6 +93,7 @@ def main():
     text_label.place(x=710, y=10)
     entry_col.place(x=1050, y=27)
     entry_col.bind("<Return>", on_change)
+    c.pack()
     root.mainloop()
 
 

@@ -1,7 +1,22 @@
 from Field import Field
+from tkinter import *
+
+
+def draw_canvas():
+    root = Tk()
+    c = Canvas(root, width=1200, height=600, bg='white')
+    c.create_text(750, 200,
+                  text="Hello World,\nPython\nand Tk")
+    c.pack()
+    c.create_rectangle(0, 0, 700, 600, fill='#8D84FF')
+    for col in range(7):
+        for row in range(6):
+            c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3)
+    root.mainloop()
 
 
 def main():
+    draw_canvas()
     field = Field()
     somebody_wins = False
     moves = 0
@@ -22,6 +37,7 @@ def main():
             print("Please, type the correct number of the column")
             print_field = False
             continue
+
         print_field = True
         somebody_wins = turn_result
         player ^= 1

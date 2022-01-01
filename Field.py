@@ -5,7 +5,7 @@ class Field:
         self.cells = [[2 for i in range(6)] for j in range(7)]
 
     def _put_chip(self, col: int, player: bool) -> bool:
-        if self.used[col] >= 7:
+        if self.used[col] >= 6:
             return False
         self.cells[col][self.used[col]] = player
         self.used[col] += 1

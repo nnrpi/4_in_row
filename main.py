@@ -35,7 +35,9 @@ def make_turn(col: str) -> int:
 
 
 def on_change(entry_col):
-    # global col
+    if somebody_wins or moves >= 42:
+        entry_col.widget.delete(0, 'end')
+        return
     col = entry_col.widget.get()
     entry_col.widget.delete(0, 'end')
     result = make_turn(col)

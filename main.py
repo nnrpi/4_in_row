@@ -50,10 +50,11 @@ def make_turn(col: Union[int, str]) -> None:
             colour = "green"
         else:
             colour = "red"
-        c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill=colour, width=3)
+        cell = c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill=colour, width=3)
+        c.tag_bind(cell, '<ButtonPress-1>', on_click_cell)
         print(field)
         if somebody_wins:
-            text_label['text'] = "Player {0} wins!\nCongrats!!!".format((player ^ 1) + 1)
+            text_label['text'] = "Player {0} wins! Congrats!!!".format((player ^ 1) + 1)
         if moves == 42:
             text_label['text'] = "Draw!"
 
@@ -76,14 +77,15 @@ def on_click_cell(event) -> None:
 
 def main():
     root.resizable(width=False, height=False)
-    rect = c.create_rectangle(0, 0, 700, 600, fill='#8D84FF')
-    cells = [
-        [c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3) for row in
-         range(6)]
-        for col in range(7)]
+    c.create_rectangle(0, 0, 700, 600, fill='#8D84FF')
+    # cells = [
+    #     [c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3) for row in
+    #      range(6)]
+    #     for col in range(7)]
     for col in range(7):
         for row in range(6):
-            c.tag_bind(cells[col][row], '<ButtonPress-1>', on_click_cell)
+            cell = c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3)
+            c.tag_bind(cell, '<ButtonPress-1>', on_click_cell)
     for col in range(7):
         number_frame = Frame(root, width=100, height=50, bg="white")
         number_frame.pack_propagate(False)

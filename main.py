@@ -78,10 +78,6 @@ def on_click_cell(event) -> None:
 def main():
     root.resizable(width=False, height=False)
     c.create_rectangle(0, 0, 700, 600, fill='#8D84FF')
-    # cells = [
-    #     [c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3) for row in
-    #      range(6)]
-    #     for col in range(7)]
     for col in range(7):
         for row in range(6):
             cell = c.create_oval(col * 100 + 10, row * 100 + 10, col * 100 + 90, row * 100 + 90, fill="white", width=3)

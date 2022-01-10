@@ -1,63 +1,73 @@
+from typing import List
+
 from Field import Field
 
-INF = 1000
+INF = 100000
 
 
 # 0 - player, 1 - bot
 # player == True => it's our turn
 # else: it's bot's turn
 
+scores = []
+
 
 def evaluate(field: Field, player: bool) -> int:
-    if field._check_win(True):
+    if field.check_win(player):
         return INF
 
-    if field._check_win(False):
+    if field.check_win(not player):
         return -INF
 
-    for col in range(7):
-        if field.used[col] != 6:
-            break
-    else:
+    if field.check_draw():
         return 0
 
-    if player:
-        return INF + field.count_3(player) * 10
-
-    return -INF-(field.count_3(player) * 10)
+    res = field.count_3(player) * 10 - field.count_3(not player) * 10
+    return res
 
 
-def minimax(field: Field, depth: int, player: bool, alpha: int, beta: int) -> (int, int):
-    if depth == 6:
-        return evaluate(field, player), -1
+def alpha_beta(field: Field, alpha: int, beta: int, depth: int, player: bool) -> (int, int):
+    # print("depth: ", depth)
+    if depth == 5:
+        # print("max depth")
+        return evaluate(field, player), 8
+    
+    if field.check_win(player):
+        # print("I'm win")
+        return INF, 8
 
-    needed_col = -1
-    if player:
-        best_value = -INF
-        for col in range(7):
-            if field.used[col] < 6:
-                field._put_chip(col, True)
-                cur_value, cur_col = minimax(field, depth + 1, False, alpha, beta)
-                field.used[col] -= 1
-                field.cells[col][field.used[col]] = 2
-                if cur_value > best_value:
-                    best_value = max(best_value, cur_value)
-                    needed_col = col
-                alpha = max(alpha, best_value)
-                if alpha >= beta:
-                    break
-        return best_value, needed_col
-    best_value = INF
+    if field.check_win(not player):
+        # print("He wins")
+        return -INF, 8
+
+    if field.check_draw():
+        # print("draw")
+        return 0, 8
+
+    if depth == 0:
+        global scores
+        scores = [0 for x in range(7)]
+
+    needed_col = 8
     for col in range(7):
+        # print("COL {0} DEPTH {1}".format(col, depth))
         if field.used[col] < 6:
-            field._put_chip(col, False)
-            cur_value, cur_col = minimax(field, depth + 1, True, alpha, beta)
+            field._put_chip(col, player)
+            score, cur_col = alpha_beta(field, -beta, -alpha, depth + 1, not player)
+            if depth == 0:
+                scores[col] = score
             field.used[col] -= 1
             field.cells[col][field.used[col]] = 2
-            if cur_value < best_value:
-                best_value = min(best_value, cur_value)
+            score *= -1
+            if score >= beta:
+                return beta, col
+            if score > alpha:
+                alpha = score
                 needed_col = col
-            beta = min(alpha, best_value)
-            if alpha >= beta:
-                break
-    return best_value, needed_col
+    # print("needed col: ", needed_col)
+    return alpha, needed_col
+
+
+def make_alpha_beta(field: Field) -> (int, int, List[int]):
+    alpha, needed_col = alpha_beta(field, -INF, INF, 0, True)
+    return alpha, needed_col, scores

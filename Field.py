@@ -43,9 +43,15 @@ class Field:
                     return True
         return False
 
-    def _check_win(self, player: bool) -> bool:
+    def check_win(self, player: bool) -> bool:
         return self._check_horizontals(player) or self._check_verticals(player) or self._check_diagonals1(
             player) or self._check_diagonals2(player)
+
+    def check_draw(self) -> bool:
+        for col in range(7):
+            if self.used[col] != 6:
+                return False
+        return True
 
     def __str__(self):
         field_str = ""
@@ -63,7 +69,7 @@ class Field:
     def turn(self, col: int, player: bool) -> int:
         if not self._put_chip(col, player):
             return 2
-        return self._check_win(player)
+        return self.check_win(player)
 
     def count_horizontal_3(self, player: bool) -> int:
         res = 0

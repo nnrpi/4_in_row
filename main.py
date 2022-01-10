@@ -1,7 +1,7 @@
 from Field import Field
 from tkinter import *
 from typing import Union
-from alpha_beta import minimax
+from alpha_beta import make_alpha_beta
 from alpha_beta import INF
 import time
 
@@ -44,9 +44,6 @@ def try_turn(col: Union[int, str]) -> int:
 def make_turn(col: Union[int, str]) -> None:
     result = try_turn(col)
     if result != 2:
-        # text_label[
-        #     'text'] = "Player {0}, please type the number of the column\nwhere you'd lke to put your chip:".format(
-        #     player + 1)
         col = int(col) - 1
         row = 6 - field.used[col]
         if player == 1:
@@ -64,10 +61,23 @@ def make_turn(col: Union[int, str]) -> None:
 
 
 def make_bot_turn() -> None:
-    if somebody_wins:
+    if field.check_win(True):
+        text_label['text'] = "Bot wins! Congrats!!!"
         return
-    turn_res, col = minimax(field, 0, True, -INF, +INF)
+    if field.check_win(False):
+        return
+    global moves
+    if moves == 42:
+        text_label['text'] = "Draw!"
+        return
+    turn_res, col, scores = make_alpha_beta(field)
+    print(scores)
+    if -turn_res not in scores:
+        print("ahtung!!!")
+        exit(0)
+    col = scores.index(-turn_res)
     field.turn(col, True)
+    moves += 1
     print(turn_res, col)
     row = 6 - field.used[col]
     colour = "green"
@@ -75,6 +85,12 @@ def make_bot_turn() -> None:
     c.tag_bind(cell, '<ButtonPress-1>', on_click_cell)
     c.update()
     print(field)
+    if field.check_win(True):
+        text_label['text'] = "Bot wins! Congrats!!!"
+        return
+    if moves == 42:
+        text_label['text'] = "Draw!"
+        return
     if somebody_wins:
         text_label['text'] = "Player {0} wins! Congrats!!!".format(player + 1)
     if moves == 42:
@@ -93,6 +109,8 @@ def on_change(entry_col) -> None:
 
 
 def on_click_cell(event) -> None:
+    print("moves: ", moves)
+    print("-" * 40)
     if somebody_wins or moves >= 42:
         return
     col = event.x // 100 + 1

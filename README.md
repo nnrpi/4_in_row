@@ -5,4 +5,4 @@ connect four of your own pieces in a row (vertically, horizontally or diagonally
 only on the top of the column. Once your piece is placed, you can't move it. You win when you get your line of four, but if no one ends up with a line, the game 
 is a tie.   
 
-There you can choose hot to play": with your friend or with a bot. The interface is very simple too, so just download the project and enjoy! Good luck, have fun!
+There you can choose how to play: with your friend or with a bot. The interface is very simple too, so just download the project and enjoy! Good luck, have fun!
